@@ -1,0 +1,9 @@
+{
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "appService.defaultWebAppToDeploy": "/subscriptions/1ba1c4a5-8858-42a4-8952-96591f840cf3/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/webApplicationmonitor",
+    "appService.deploySubpath": "."
+}
