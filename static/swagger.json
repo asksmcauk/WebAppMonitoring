@@ -1,0 +1,53 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "Access API",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/websitestatus": {
+        "post": {
+          "description": "API to get Web Application Health Status. ",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "name": "inputFile",
+              "in": "formData",
+              "description": "The file name should be inputFile.json and should follow the following schema. {\"url\":\"url value\"} Ex.{\"url\":\"https://www.google.com/\"}",
+              "required": false,
+              "type": "file",
+              "schema": {
+                "$ref": "#/definitions/AccessData"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Web Application is Not Found or not Working."
+            },
+            "400": {
+              "description": "Invalid request data."
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "AccessData": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "server": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
