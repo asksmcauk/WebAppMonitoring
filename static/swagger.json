@@ -18,12 +18,9 @@
             {
               "name": "inputFile",
               "in": "formData",
-              "description": "The file name should be inputFile.json and should follow the following schema. {\"url\":\"url value\"} Ex.{\"url\":\"https://www.google.com/\"}",
+              "description": "The file name should be inputFile.json",
               "required": false,
-              "type": "file",
-              "schema": {
-                "$ref": "#/definitions/AccessData"
-              }
+              "type": "file"
             }
           ],
           "responses": {
@@ -33,19 +30,6 @@
             "400": {
               "description": "Invalid request data."
             }
-          }
-        }
-      }
-    },
-    "definitions": {
-      "AccessData": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "server": {
-            "type": "string"
           }
         }
       }

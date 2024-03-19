@@ -5,6 +5,7 @@ import requests
 import validators
 
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask import jsonify
 
 SWAGGER_URL="/swagger"
 API_URL="/static/swagger.json"
@@ -35,20 +36,33 @@ def check_websitestatus():
     file_content = file.read()
     data = json.loads(file_content)
 
-    if data['url'] is None:
-        return 'URL is Empty'
-    
-    validation = validators.url(data['url'])
-    if validation != True:
-        return 'Invalid URL.'
+    outmessage = {}
+    for rootKey,rootVal in data.items():
+        lstRoot = []
+        for childVal in rootVal:
+            for k,v in childVal.items():
+                if validators.url(v):
+                    lstRoot.append(getStatus(k,v))
+        outmessage[rootKey] = lstRoot
+
+    return jsonify(outmessage)
+
+def getStatus(k,v):
+    urloutput = {}
+    urloutput.update({k: v})
     try:
-        uResponse = requests.get(data['url'])
+        uresponse = requests.get(v)
     except Exception:
-        return "Web Application is Not Found or not Working."
-    if uResponse.status_code == 200:
-        return "HTTP request is successful."
+        urloutput.update({"status_code": "000"})
+        urloutput.update({"status": "Failed"})
+        return urloutput
+
+    urloutput.update({"status_code": uresponse.status_code})
+    if uresponse.status_code == 200:
+        urloutput.update({"status": "Success"})
     else:
-        return "HTTP request is unsuccessful,Please check"
+        urloutput.update({"status": "Failed"})
+    return urloutput
 
 if __name__ == '__main__':
     app.run(debug=True)
