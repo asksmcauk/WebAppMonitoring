@@ -6,7 +6,6 @@ import validators
 
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import jsonify
-
 SWAGGER_URL="/swagger"
 API_URL="/static/swagger.json"
 
@@ -28,14 +27,30 @@ def index():
 #API to check the website health status
 @app.route('/websitestatus', methods=['POST','GET'])
 def check_websitestatus():
+  
     file = request.files['inputFile']
-
     if file.filename == '':
         return 'No selected file'
 
     file_content = file.read()
+    #print (file_content)
     data = json.loads(file_content)
 
+    outmessage = {}
+    for rootKey,rootVal in data.items():
+        lstRoot = []
+        for childVal in rootVal:
+            for k,v in childVal.items():
+                if validators.url(v):
+                    lstRoot.append(getStatus(k,v))
+        outmessage[rootKey] = lstRoot
+    #print (outmessage)
+    return jsonify(outmessage)
+
+@app.route('/getstatus', methods=['POST','GET'])
+def getStatus(): 
+    data = request.get_json(silent=True)
+    #print(data)
     outmessage = {}
     for rootKey,rootVal in data.items():
         lstRoot = []

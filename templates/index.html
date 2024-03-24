@@ -1,0 +1,105 @@
+<html lang="en">
+<head>
+    <style>
+        #status {
+          font-family: Arial, Helvetica, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
+        
+        #status td, #customers th {
+          border: 1px solid #ddd;
+          padding: 8px;
+        }
+        
+        #status tr:nth-child(even){background-color: #f2f2f2;}
+        
+        #status tr:hover {background-color: #ddd;}
+        
+        #status th {
+          padding-top: 12px;
+          padding-bottom: 12px;
+          text-align: left;
+          background-color: #04AA6D;
+          color: white;
+        }
+        body
+        {
+            background-color: silver;
+            margin: auto;
+  width: 50%;
+  
+  padding: 10px;
+  padding-top: 4%;
+        }
+ 
+        </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload and Send JSON Data</title>
+</head>
+<body>
+<h2>Upload JSON file to get the website running status</h2>
+<form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="jsonFile" name="jsonFile" accept=".json">
+    <br/> <br/>
+    <button type="submit">Upload & Send</button>
+</form>
+<div id="result"></div>
+
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    var fileInput = document.getElementById('jsonFile');
+    var file = fileInput.files[0];
+    if (!file) {
+        alert('Please select a JSON file.');
+        return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(event) {
+        var jsonData = event.target.result;
+
+        fetch('https://websitemonitorapp.azurewebsites.net/getstatus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: jsonData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Process the result
+           // document.getElementById('result').innerHTML = JSON.stringify(data, null, 2);
+           renderTable(data)
+        })
+        .catch(error => {
+            document.getElementById('result').innerHTML=error
+        });
+    };
+    reader.readAsText(file);
+});
+function renderTable(data) {
+    var tableHtml = '<table id="status" width="80%"><tr><th>App Name</th><th>App URL</th><th>APP URL Status</th><th>APP URL Status Code</th></tr>';
+
+    // Iterate through categories
+    Object.keys(data).forEach(category => {
+        data[category].forEach(item => {
+            tableHtml += '<tr>';
+            tableHtml += '<td>' + category + '</td>';
+            tableHtml += '<td>' + item.static_link + '</td>';
+            tableHtml += '<td>' + item.status + '</td>';
+            tableHtml += '<td>' + item.status_code + '</td>';
+            tableHtml += '</tr>';
+        });
+    });
+
+    tableHtml += '</table>';
+
+    document.getElementById('result').innerHTML = tableHtml;
+}
+</script>
+</body>
+</html>
