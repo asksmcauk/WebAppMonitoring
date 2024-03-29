@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google web scrap</title>
+<style>
+    textarea {
+        width: 100%;
+        height: 200px;
+    }
+</style>
+</head>
+<body>
+
+<form id="apiForm">
+    <label for="Query">Search keyword:</label><br/>
+    <input type="text" id="param" name="param"><br/><br/><br/>
+    <button type="submit">Search</button>
+</form>
+
+<textarea id="result1" style="display:none" readonly></textarea><br><br><br>
+<textarea id="result2" style="display:none" readonly></textarea><br><br><br>
+<textarea id="result3" style="display:none" readonly></textarea><br><br><br>
+<textarea id="result4" style="display:none" readonly></textarea><br><br><br>
+<textarea id="result5" style="display:none" readonly></textarea><br><br><br>
+
+<script>
+document.getElementById("apiForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent the form from submitting traditionally
+
+    // Get the parameter from the form input
+    var param = document.getElementById("param").value;
+
+    // Make a request to the API
+    fetch("https://websitemonitorapp.azurewebsites.net/google_search?query=" + encodeURIComponent(param))
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(data => {
+            // Display the result in the textarea
+            for(i=0;i<=4;++i)
+            {
+                alert(i);
+                document.getElementById("result"+(i+1)).style.display=""
+                document.getElementById("result"+(i+1)).value = JSON.parse(data)[i];
+  
+            }
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            document.getElementById("result").value = "Error: " + error.message;
+        });
+});
+ 
+</script>
+
+</body>
+</html>

@@ -1,8 +1,9 @@
 import json
 from flask import Flask, request, render_template
-
 import requests
 import validators
+from googlesearch import search
+from bs4 import BeautifulSoup
 
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import jsonify
@@ -33,7 +34,7 @@ def check_websitestatus():
         return 'No selected file'
 
     file_content = file.read()
-    #print (file_content)
+    #   print (file_content)
     data = json.loads(file_content)
 
     outmessage = {}
@@ -78,6 +79,46 @@ def getStatus(k,v):
     else:
         urloutput.update({"status": "Failed"})
     return urloutput
+
+@app.route('/search', methods=['GET'])
+def search():
+    return render_template('search.html')
+
+@app.route('/google_search', methods=['GET'])
+def google_search():
+    my_list =[]
+    query = request.args.get('query')
+    if not query:
+        return jsonify({'error': 'No query provided'}), 400
+    
+    try:
+        links = list(search(query, num=5, stop=5))
+        for item in links:
+            my_list.append(read_website(item))
+        return json.dumps(my_list)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+ 
+def read_website(k):
+    try:
+        response = requests.get(k)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            text = soup.get_text()
+            return  replace_special_characters(text.strip())
+        else:
+            return  'Failed to fetch content from the provided URL'
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500   
+
+def replace_special_characters(text, replacement=' '):
+    special_characters = "!@#$%^&*()-_=+[]{};:'\",.<>/?\\|`~"
+    for char in special_characters:
+        text = text.replace(char, replacement)
+        text = text.replace('\n', '')
+    return text
 
 if __name__ == '__main__':
     app.run(debug=True)
