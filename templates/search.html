@@ -43,7 +43,6 @@ document.getElementById("apiForm").addEventListener("submit", function(event) {
             // Display the result in the textarea
             for(i=0;i<=4;++i)
             {
-                alert(i);
                 document.getElementById("result"+(i+1)).style.display=""
                 document.getElementById("result"+(i+1)).value = JSON.parse(data)[i];
   
