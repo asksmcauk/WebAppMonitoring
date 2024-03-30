@@ -21,9 +21,13 @@ app = Flask(__name__)
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/', defaults={'page':None})
+@app.route('/<page>')
+def index(page):
+    if page == None:
+        return render_template('index.html')
+    else:
+        return render_template('search.html')
 
 #API to check the website health status
 @app.route('/websitestatus', methods=['POST','GET'])
@@ -80,10 +84,6 @@ def getStatus(k,v):
         urloutput.update({"status": "Failed"})
     return urloutput
 
-@app.route('/search', methods=['GET'])
-def search():
-    return render_template('search.html')
-
 @app.route('/google_search', methods=['GET'])
 def google_search():
     my_list =[]
@@ -93,6 +93,7 @@ def google_search():
     
     try:
         links = list(search(query, num=5, stop=5))
+        #links = list(search(query, tld='com', lang='en', num=5, start=0, stop=5, pause=2))
         for item in links:
             my_list.append(read_website(item))
         return json.dumps(my_list)
